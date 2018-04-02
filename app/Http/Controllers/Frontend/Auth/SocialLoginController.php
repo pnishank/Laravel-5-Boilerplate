@@ -27,7 +27,7 @@ class SocialLoginController extends Controller
     /**
      * SocialLoginController constructor.
      *
-     * @param UserRepository  $userRepository
+     * @param UserRepository $userRepository
      * @param SocialiteHelper $socialiteHelper
      */
     public function __construct(UserRepository $userRepository, SocialiteHelper $socialiteHelper)
@@ -50,7 +50,7 @@ class SocialLoginController extends Controller
         $user = null;
 
         // If the provider is not an acceptable third party than kick back
-        if (! in_array($provider, $this->socialiteHelper->getAcceptedProviders())) {
+        if (!in_array($provider, $this->socialiteHelper->getAcceptedProviders())) {
             return redirect()->route(home_route())->withFlashDanger(__('auth.socialite.unacceptable', ['provider' => $provider]));
         }
 
@@ -59,7 +59,7 @@ class SocialLoginController extends Controller
          * It's redirected to the provider and then back here, where request is populated
          * So it then continues creating the user
          */
-        if (! $request->all()) {
+        if (!$request->all()) {
             return $this->getAuthorizationFirst($provider);
         }
 
@@ -75,7 +75,7 @@ class SocialLoginController extends Controller
         }
 
         // Check to see if they are active.
-        if (! $user->isActive()) {
+        if (!$user->isActive()) {
             throw new GeneralException(__('exceptions.frontend.auth.deactivated'));
         }
 
@@ -105,7 +105,6 @@ class SocialLoginController extends Controller
         $scopes = empty(config("services.{$provider}.scopes")) ? false : config("services.{$provider}.scopes");
         $with = empty(config("services.{$provider}.with")) ? false : config("services.{$provider}.with");
         $fields = empty(config("services.{$provider}.fields")) ? false : config("services.{$provider}.fields");
-
         if ($scopes) {
             $socialite->scopes($scopes);
         }
