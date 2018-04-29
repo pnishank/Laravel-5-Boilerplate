@@ -26,4 +26,8 @@ output.txt
 /.vscode
 .php_cs.cache
 coverage.xml
+<<<<<<< HEAD
 /coverage
+=======
+/coverage
+>>>>>>> 9bb18b805a21672f507a0177c48ab28f61f70a17

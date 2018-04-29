@@ -6,11 +6,10 @@ use App\Models\Auth\User;
 use Illuminate\Support\Facades\DB;
 use App\Exceptions\GeneralException;
 use App\Repositories\BaseRepository;
-use Illuminate\Support\Facades\Hash;
-use App\Events\Frontend\Auth\UserConfirmed;
 use App\Events\Backend\Auth\User\UserCreated;
 use App\Events\Backend\Auth\User\UserUpdated;
 use App\Events\Backend\Auth\User\UserRestored;
+use App\Events\Backend\Auth\User\UserConfirmed;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Events\Backend\Auth\User\UserDeactivated;
 use App\Events\Backend\Auth\User\UserReactivated;
@@ -106,7 +105,7 @@ class UserRepository extends BaseRepository
                 'last_name' => $data['last_name'],
                 'email' => $data['email'],
                 'timezone' => $data['timezone'],
-                'password' => Hash::make($data['password']),
+                'password' => $data['password'],
                 'active' => isset($data['active']) && $data['active'] == '1' ? 1 : 0,
                 'confirmation_code' => md5(uniqid(mt_rand(), true)),
                 'confirmed' => isset($data['confirmed']) && $data['confirmed'] == '1' ? 1 : 0,
@@ -188,9 +187,7 @@ class UserRepository extends BaseRepository
      */
     public function updatePassword(User $user, $input) : User
     {
-        $user->password = Hash::make($input['password']);
-
-        if ($user->save()) {
+        if ($user->update(['password' => $input['password']])) {
             event(new UserPasswordChanged($user));
 
             return $user;
@@ -239,7 +236,7 @@ class UserRepository extends BaseRepository
      */
     public function confirm(User $user) : User
     {
-        if ($user->confirmed == 1) {
+        if ($user->confirmed) {
             throw new GeneralException(__('exceptions.backend.access.users.already_confirmed'));
         }
 
@@ -268,7 +265,7 @@ class UserRepository extends BaseRepository
      */
     public function unconfirm(User $user) : User
     {
-        if ($user->confirmed == 0) {
+        if (! $user->confirmed) {
             throw new GeneralException(__('exceptions.backend.access.users.not_confirmed'));
         }
 
@@ -310,7 +307,9 @@ class UserRepository extends BaseRepository
 
         return DB::transaction(function () use ($user) {
             // Delete associated relationships
+            $user->passwordHistories()->delete();
             $user->providers()->delete();
+            $user->sessions()->delete();
 
             if ($user->forceDelete()) {
                 event(new UserPermanentlyDeleted($user));
