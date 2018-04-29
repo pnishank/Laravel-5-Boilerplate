@@ -23,4 +23,7 @@ _ide_helper.php
 composer.phar
 error.log
 output.txt
-/.idea
+/.vscode
+.php_cs.cache
+coverage.xml
+/coverage
