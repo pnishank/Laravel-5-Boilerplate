@@ -64,6 +64,8 @@
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan ide-helper:generate",
+            "@php artisan ide-helper:meta",
             "@php artisan package:discover"
         ],
         "clear-all": [
@@ -75,6 +77,15 @@
         ],
         "phpunit": [
             "phpunit > output.txt -d memory_limit=2048M"
+        ],
+        "coverage-xml": [
+            "phpunit --coverage-clover ./coverage.xml"
+        ],
+        "coverage-html": [
+            "phpunit --coverage-html ./coverage"
+        ],
+        "coverage-text": [
+            "phpunit --coverage-text"
         ],
         "format": [
             "./vendor/bin/php-cs-fixer fix app/  --show-progress=estimating",
